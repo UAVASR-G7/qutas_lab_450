@@ -3,12 +3,12 @@
 	<!-- Common Settings -->
 	<arg name="frame_id" default="map" />
 	<arg name="topic_grid" default="/grid" />
-	<arg name="vicon_server_dvp" default="192.168.1.101"/>
+	<arg name="vicon_server_dvp" default="10.68.42.85"/>
 
 	<!-- Configure for each system Setup -->
-	<arg name="vicon" default="true" />
-	<arg name="optitrack" default="false" />
-	<arg name="vrpn_object_name" default="uav" />
+	<arg name="vicon" default="false" />
+	<arg name="optitrack" default="true" />
+	<arg name="vrpn_object_name" default="uavteam7" />
 
 	<!-- VRPN Clinet (VICON) -->
 	<group if="$(arg vicon)">
