@@ -1,11 +1,17 @@
 #include <ros/ros.h>
-
 #include <area_map/area_map.h>
-
 #include <nav_msgs/OccupancyGrid.h>
-
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <cmath>  /*For sqrt and pow*/ 
+
+bool isTooClose(const obstacles_t& obs1, const obstacles_t& obs2) {
+	// Calculate Euclidean distance between the centers of two obstacles
+	double distance = sqrt(pow(obs1.x - obs2.x, 2) + pow(obs1.y - obs2.y, 2));
+	double min_distance = obs1.size + obs2.size; // Minimum distance based on the sizes
+
+	return (distance < min_distance);
+}
 
 AreaMap::AreaMap() :
 	nh_("~"),
@@ -65,23 +71,36 @@ AreaMap::AreaMap() :
 			nh_.param("obstacles/size", obs.size, obs.size);  // Using the same size from the YAML file
 			nh_.param("obstacles/divisor", axes_div, axes_div);
 
-			// Randomly decide which axis (x or y) to place the obstacle on
-			if(rand() % 2) {
-				obs.x = param_map_width_ / axes_div;
-				obs.y = p * param_map_width_ / axes_div;
-			} else {
-				obs.x = p * param_map_width_ / axes_div;
-				obs.y = param_map_height_ / axes_div;
+			bool valid_position = false;
+			while (!valid_position) {
+				// Randomly decide which axis (x or y) to place the obstacle on
+				if(rand() % 2) {
+					obs.x = param_map_width_ / axes_div;
+					obs.y = p * param_map_width_ / axes_div;
+				} else {
+					obs.x = p * param_map_width_ / axes_div;
+					obs.y = param_map_height_ / axes_div;
+				}
+
+				// Shift the position to the center of the map
+				obs.x += param_map_width_ / 2;
+				obs.y += param_map_height_ / 2;
+
+				// Check if this obstacle is too close to any previously generated obstacles
+				valid_position = true;
+				for (const auto& prev_obs : obs_) {
+					if (isTooClose(obs, prev_obs)) {
+						valid_position = false;  // Too close to another obstacle, re-generate
+						break;
+					}
+				}
 			}
 
-			// Shift the position to the center of the map
-			obs.x += param_map_width_ / 2;
-			obs.y += param_map_height_ / 2;
-
 			ROS_INFO("Random obstacle %d placed (s:%i;d:%i;p:%0.2f)", j+1, obs.size, axes_div, p);
-			obs_.push_back(obs);  // Add the obstacle to the list
+			obs_.push_back(obs);  // Add the obstacle to the list once it's placed properly
 		}
 	}
+
 
 
 	//Setup publisher
