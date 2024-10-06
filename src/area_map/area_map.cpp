@@ -53,34 +53,36 @@ AreaMap::AreaMap() :
 	}
 
 	if(i == 0) {
-		srand (time(NULL));
+		srand (time(NULL));  // Random seed initialization
 
-		obstacles_t obs;
-		obs.type = OBS_SQUARE;
-		obs.size = 3;
-		int axes_div = 6;
-		//place other axes at random -100% to +100%
-		double p = 2*(((rand() % 101) / 100.0) - 0.5);
-		//p=-1.0;
+		for (int j = 0; j < 2; j++) {  // Loop twice to generate two obstacles
+			obstacles_t obs;
+			obs.type = OBS_SQUARE;  // You can adjust this for different obstacle types (circle, etc.)
+			obs.size = 3;
+			int axes_div = 6;
+			double p = 2*(((rand() % 101) / 100.0) - 0.5);  // Random positioning on the axis
 
-		nh_.param("obstacles/size", obs.size, obs.size);
-		nh_.param("obstacles/divisor", axes_div, axes_div);
+			nh_.param("obstacles/size", obs.size, obs.size);  // Using the same size from the YAML file
+			nh_.param("obstacles/divisor", axes_div, axes_div);
 
-		//Place obstacle along one of the axes at random
-		if(rand() % 2) {
-			obs.x = param_map_width_ / axes_div;
-			obs.y = p * param_map_width_ / axes_div;
-		} else {
-			obs.x = p * param_map_width_ / axes_div;
-			obs.y = param_map_height_ / axes_div;
+			// Randomly decide which axis (x or y) to place the obstacle on
+			if(rand() % 2) {
+				obs.x = param_map_width_ / axes_div;
+				obs.y = p * param_map_width_ / axes_div;
+			} else {
+				obs.x = p * param_map_width_ / axes_div;
+				obs.y = param_map_height_ / axes_div;
+			}
+
+			// Shift the position to the center of the map
+			obs.x += param_map_width_ / 2;
+			obs.y += param_map_height_ / 2;
+
+			ROS_INFO("Random obstacle %d placed (s:%i;d:%i;p:%0.2f)", j+1, obs.size, axes_div, p);
+			obs_.push_back(obs);  // Add the obstacle to the list
 		}
-
-		obs.x += param_map_width_ / 2;
-		obs.y += param_map_height_ / 2;
-
-		ROS_INFO("No obstacles define, placing random obstacle (s:%i;d:%i;p:%0.2f)", obs.size, axes_div, p);
-		obs_.push_back(obs);
 	}
+
 
 	//Setup publisher
 	pub_map_ = nh_.advertise<nav_msgs::OccupancyGrid>("grid", 1, true);

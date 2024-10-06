@@ -63,7 +63,7 @@
 		<param name="topic_grid" value="$(arg topic_grid)" type="str" />
 		<param name="topic_markers" value="markers" type="str" />
 		<param name="marker/namespace" value="area_viz" type="str" />
-		<param name="marker/height" value="2.0" type="double" />
+		<param name="marker/height" value="2.3" type="double" />
 		<param name="marker/color/alpha" value="1.0" type="double" />
 		<param name="marker/color/red" value="0.5" type="double" />
 		<param name="marker/color/green" value="0.5" type="double" />
