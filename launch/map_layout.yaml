@@ -6,7 +6,7 @@ map:
 
 obstacles:
   rand:
-    size: 3
+    size: 5
     divisor: 6
   #obs_0:
   #  type: "square"
