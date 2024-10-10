@@ -93,7 +93,7 @@ AreaMap::AreaMap() :
         srand(time(NULL));  // Random seed initialization
 
         // List of quadrants to ensure unique quadrant assignment
-        std::vector<int> available_quadrants = {1, 2, 3, 4};
+        std::vector<int> available_quadrants = {1, 2, 4};
 
         for (int j = 0; j < 2; j++) {  // Loop twice to generate two obstacles
             obstacles_t obs;
